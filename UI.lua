@@ -1,8 +1,3 @@
---[[
-    Lemon UI - Complete Fixed Version
-    Loadstring: loadstring(game:HttpGet("https://raw.githubusercontent.com/username/Lemon/main/Lemon.lua"))()
-]]
-
 -- Services 
 local InputService  = game:GetService("UserInputService")
 local HttpService   = game:GetService("HttpService")
@@ -384,56 +379,6 @@ function Lemon:AddChatMessage(userId, username, message, timestamp)
     Lemon.ChatUI.MessagesFrame.CanvasPosition = vec2(0, Lemon.ChatUI.MessagesFrame.CanvasSize.Y.Offset)
 end
 
-function Lemon:Resizify(Parent)
-    local UIS = game:GetService("UserInputService")
-    local Resizing = Lemon:Create("TextButton", {
-        AnchorPoint = vec2(1, 1), Position = dim2(1, 0, 1, 0), Size = dim2(0, 30, 0, 30),
-        BorderSizePixel = 0, BackgroundTransparency = 1, Text = "", Parent = Parent, ZIndex = 999,
-    })
-    
-    local grip = Lemon:Create("ImageLabel", {
-        Parent = Resizing,
-        AnchorPoint = vec2(1, 1),
-        Position = dim2(1, -4, 1, -4),
-        Size = dim2(0, 18, 0, 18),
-        BackgroundTransparency = 1,
-        Image = "rbxthumb://type=Asset&id=6153965696&w=150&h=150",
-        ImageColor3 = themes.preset.accent,
-        ImageTransparency = 0.5
-    })
-    
-    Lemon:Themify(grip, "accent", "ImageColor3")
-
-    local IsResizing, StartInputPos, StartSize = false, nil, nil
-    local MIN_SIZE = vec2(600, 480)
-    local MAX_SIZE = vec2(900, 700)
-
-    Resizing.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            IsResizing = true
-            StartInputPos = input.Position
-            StartSize = Parent.AbsoluteSize
-        end
-    end)
-
-    Resizing.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            IsResizing = false
-        end
-    end)
-
-    UIS.InputChanged:Connect(function(input)
-        if not IsResizing then return end
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-            local delta = input.Position - StartInputPos
-            Parent.Size = UDim2.fromOffset(
-                math.clamp(StartSize.X + delta.X, MIN_SIZE.X, MAX_SIZE.X),
-                math.clamp(StartSize.Y + delta.Y, MIN_SIZE.Y, MAX_SIZE.Y)
-            )
-        end
-    end)
-end
-
 -- Window function
 function Lemon:Window(properties)
     local Cfg = {
@@ -529,12 +474,13 @@ function Lemon:Window(properties)
         Parent = Lemon.Gui,
         AnchorPoint = vec2(1, 0),
         Position = dim2(1, -20, 0, 20),
-        Size = dim2(0, 28, 0, 28),
+        Size = dim2(0, 36, 0, 36),
         BackgroundTransparency = 1,
         Image = "rbxassetid://86658474847671",
         ImageColor3 = themes.preset.subtext,
         ZIndex = 1000
     })
+    Lemon:Create("UICorner", { Parent = Items.CloseBtn, CornerRadius = dim(0, 10) })
     Lemon:Themify(Items.CloseBtn, "subtext", "ImageColor3")
     
     Items.CloseBtn.MouseButton1Click:Connect(function()
@@ -627,7 +573,7 @@ function Lemon:Window(properties)
         FillDirection = Enum.FillDirection.Horizontal, 
         HorizontalAlignment = Enum.HorizontalAlignment.Center, 
         VerticalAlignment = Enum.VerticalAlignment.Center, 
-        Padding = dim(0, 6) 
+        Padding = dim(0, 4) 
     })
 
     -- Dragging Logic
@@ -650,7 +596,6 @@ function Lemon:Window(properties)
             end
         end
     end)
-    Lemon:Resizify(Items.Wrapper)
 
     function Cfg.ToggleMenu(bool)
         if Cfg.Tweening then return end
@@ -683,7 +628,7 @@ function Lemon:Tab(properties)
 
     if not Cfg.Hidden then
         Items.Button = Lemon:Create("TextButton", { 
-            Parent = self.Items.TabHolder, Size = dim2(0, 110, 0, 32), 
+            Parent = self.Items.TabHolder, Size = dim2(0, 120, 0, 32), 
             BackgroundColor3 = themes.preset.accent,
             BackgroundTransparency = 1, 
             Text = "", AutoButtonColor = false, ZIndex = 7,
@@ -694,13 +639,13 @@ function Lemon:Tab(properties)
         
         Items.TabName = Lemon:Create("TextLabel", {
             Parent = Items.Button,
-            Position = dim2(0, 12, 0.5, 0),
+            Position = dim2(0, 8, 0.5, 0),
             AnchorPoint = vec2(0, 0.5),
-            Size = dim2(1, -40, 1, 0),
+            Size = dim2(1, -32, 1, 0),
             BackgroundTransparency = 1,
             Text = Cfg.Name,
             TextColor3 = rgb(255, 255, 255),
-            TextSize = 13,
+            TextSize = 14,
             FontFace = Font.new("rbxassetid://12187365364", Enum.FontWeight.Bold),
             TextTransparency = 1,
             Visible = false,
@@ -710,7 +655,7 @@ function Lemon:Tab(properties)
         Lemon:Themify(Items.TabName, "text", "TextColor3")
         
         Items.IconImg = Lemon:Create("ImageLabel", { 
-            Parent = Items.Button, AnchorPoint = vec2(0, 0.5), Position = dim2(1, -16, 0.5, 0),
+            Parent = Items.Button, AnchorPoint = vec2(1, 0.5), Position = dim2(1, -8, 0.5, 0),
             Size = dim2(0, 18, 0, 18), BackgroundTransparency = 1, 
             Image = Cfg.Icon, ImageColor3 = rgb(15, 15, 15), ZIndex = 8 
         })
@@ -1047,8 +992,26 @@ function Lemon:Dropdown(properties)
     Lemon:Themify(Items.DropFrame, "element", "BackgroundColor3")
     Lemon:Create("UICorner", { Parent = Items.DropFrame, CornerRadius = dim(0, 8) })
 
+    -- Search Bar
+    Items.SearchBox = Lemon:Create("TextBox", {
+        Parent = Items.DropFrame,
+        Position = dim2(0, 6, 0, 6),
+        Size = dim2(1, -12, 0, 28),
+        BackgroundColor3 = themes.preset.section,
+        Text = "",
+        PlaceholderText = "Search...",
+        TextColor3 = themes.preset.text,
+        PlaceholderColor3 = themes.preset.subtext,
+        TextSize = 12,
+        FontFace = Font.new("rbxassetid://12187365364", Enum.FontWeight.Medium),
+        ClearTextOnFocus = false
+    })
+    Lemon:Create("UICorner", { Parent = Items.SearchBox, CornerRadius = dim(0, 6) })
+    Lemon:Themify(Items.SearchBox, "section", "BackgroundColor3")
+    Lemon:Themify(Items.SearchBox, "text", "TextColor3")
+
     Items.Scroll = Lemon:Create("ScrollingFrame", { 
-        Parent = Items.DropFrame, Size = dim2(1, 0, 1, 0), 
+        Parent = Items.DropFrame, Position = dim2(0, 0, 0, 40), Size = dim2(1, 0, 1, -40), 
         BackgroundTransparency = 1, ScrollBarThickness = 0, BorderSizePixel = 0, ZIndex = 201 
     })
     Lemon:Create("UIListLayout", { Parent = Items.Scroll, SortOrder = Enum.SortOrder.LayoutOrder })
@@ -1063,26 +1026,40 @@ function Lemon:Dropdown(properties)
             Items.DropFrame.Size = dim2(0, Items.Main.AbsoluteSize.X, 0, 0)
             
             local visibleCount = #Cfg.Options
-            local targetHeight = math.clamp(visibleCount * 24, 24, 150)
+            local targetHeight = math.clamp(visibleCount * 24 + 40, 64, 190) -- +40 for search bar
             
             Lemon:Tween(Items.Icon, {Rotation = 180}, TweenInfo.new(0.2))
             Lemon:Tween(Items.DropFrame, {Size = dim2(0, Items.Main.AbsoluteSize.X, 0, targetHeight)}, TweenInfo.new(0.2))
+            Items.SearchBox:CaptureFocus()
         else
             Open = false
             Lemon:Tween(Items.Icon, {Rotation = 0}, TweenInfo.new(0.2))
             Lemon:Tween(Items.DropFrame, {Size = dim2(0, Items.Main.AbsoluteSize.X, 0, 0)}, TweenInfo.new(0.2))
             task.wait(0.2)
             Items.DropFrame.Visible = false
+            Items.SearchBox.Text = ""
+            Cfg.FilterOptions("")
         end
     end
     Items.Main.MouseButton1Click:Connect(ToggleDropdown)
 
     function Cfg.RefreshOptions(newList)
         Cfg.Options = newList or Cfg.Options
+        Cfg.FilterOptions("")
+    end
+
+    function Cfg.FilterOptions(searchText)
         for _, btn in ipairs(OptionBtns) do btn:Destroy() end
         table.clear(OptionBtns)
         
+        local filteredOptions = {}
         for _, opt in ipairs(Cfg.Options) do
+            if searchText == "" or string.find(string.lower(tostring(opt)), string.lower(searchText)) then
+                table.insert(filteredOptions, opt)
+            end
+        end
+        
+        for _, opt in ipairs(filteredOptions) do
             local btn = Lemon:Create("TextButton", { 
                 Parent = Items.Scroll, Size = dim2(1, 0, 0, 24), BackgroundTransparency = 1, 
                 Text = "   " .. tostring(opt), TextColor3 = themes.preset.subtext, TextSize = 12, 
@@ -1095,8 +1072,12 @@ function Lemon:Dropdown(properties)
             end)
             table.insert(OptionBtns, btn)
         end
-        Items.Scroll.CanvasSize = dim2(0, 0, 0, #Cfg.Options * 24)
+        Items.Scroll.CanvasSize = dim2(0, 0, 0, #filteredOptions * 24)
     end
+
+    Items.SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+        Cfg.FilterOptions(Items.SearchBox.Text)
+    end)
 
     function Cfg.set(val)
         Items.SelectedText.Text = tostring(val)
@@ -1426,6 +1407,9 @@ function Lemon:Configs(window)
         Default = false,
         Callback = function(state)
             ChatAPI.ChatEnabled = state
+            if ChatAPI.ChatBox then
+                ChatAPI.ChatBox.Visible = state
+            end
             if state then
                 Lemon:ConnectChatServer()
                 task.spawn(function()

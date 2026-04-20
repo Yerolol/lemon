@@ -544,12 +544,12 @@ function Lemon:Window(properties)
 
     -- Chat Button removed (use Settings toggle instead)
 
-    -- Tab Box (Outside UI, below it)
+    -- Separate Tab Box (Completely Outside UI)
     Items.TabBox = Lemon:Create("Frame", {
-        Parent = Items.Wrapper,
-        AnchorPoint = vec2(0.5, 0),
-        Position = dim2(0.5, 0, 1, 5),
-        Size = dim2(0, 0, 0, 42),
+        Parent = Lemon.Gui,
+        AnchorPoint = vec2(0.5, 1),
+        Position = dim2(0.5, 0, 0.5, 120),
+        Size = dim2(0, 0, 0, 48),
         AutomaticSize = Enum.AutomaticSize.X,
         BackgroundColor3 = themes.preset.section,
         BorderSizePixel = 0,
@@ -561,10 +561,10 @@ function Lemon:Window(properties)
     
     Lemon:Create("UIPadding", {
         Parent = Items.TabBox,
-        PaddingLeft = dim(0, 6),
-        PaddingRight = dim(0, 6),
-        PaddingTop = dim(0, 5),
-        PaddingBottom = dim(0, 5)
+        PaddingLeft = dim(0, 8),
+        PaddingRight = dim(0, 8),
+        PaddingTop = dim(0, 6),
+        PaddingBottom = dim(0, 6)
     })
     
     Items.TabHolder = Lemon:Create("Frame", { 
@@ -578,7 +578,7 @@ function Lemon:Window(properties)
         FillDirection = Enum.FillDirection.Horizontal, 
         HorizontalAlignment = Enum.HorizontalAlignment.Center, 
         VerticalAlignment = Enum.VerticalAlignment.Center, 
-        Padding = dim(0, 2) 
+        Padding = dim(0, 3) 
     })
 
     -- Dragging Logic
@@ -595,6 +595,11 @@ function Lemon:Window(properties)
         if Dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             local delta = input.Position - DragStart
             Items.Wrapper.Position = UDim2.new(StartPos.X.Scale, StartPos.X.Offset + delta.X, StartPos.Y.Scale, StartPos.Y.Offset + delta.Y)
+            
+            -- Move tabs with UI
+            if Items.TabBox then
+                Items.TabBox.Position = dim2(0.5, Items.Wrapper.Position.X.Offset, 0.5, Items.Wrapper.Position.Y.Offset + 120)
+            end
             
             if ChatAPI.ChatBox then
                 ChatAPI.ChatBox.Position = dim2(0, Items.Wrapper.Position.X.Offset - 290, 0.5, Items.Wrapper.Position.Y.Offset - 200)
@@ -614,9 +619,13 @@ function Lemon:Window(properties)
     -- Create Chat UI
     Lemon:CreateChatUI()
     
-    -- Position chat relative to UI
+    -- Position chat and tabs relative to UI
     if ChatAPI.ChatBox then
         ChatAPI.ChatBox.Position = dim2(0, Items.Wrapper.Position.X.Offset - 290, 0.5, Items.Wrapper.Position.Y.Offset - 200)
+    end
+    
+    if Items.TabBox then
+        Items.TabBox.Position = dim2(0.5, Items.Wrapper.Position.X.Offset, 0.5, Items.Wrapper.Position.Y.Offset + 120)
     end
 
     return setmetatable(Cfg, Lemon)

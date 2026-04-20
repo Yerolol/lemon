@@ -77,7 +77,7 @@ end
 
 -- Chat System Variables
 local ChatAPI = {
-    BaseURL = "http://localhost:8000", -- FastAPI server URL
+    BaseURL = "http://212.132.99.151:9611", -- FastAPI server URL
     ActiveUsers = 0,
     Messages = {},
     ChatEnabled = true,

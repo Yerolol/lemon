@@ -1,3 +1,8 @@
+--[[
+    Lemon UI - Complete Fixed Version
+    Loadstring: loadstring(game:HttpGet("https://raw.githubusercontent.com/username/Lemon/main/Lemon.lua"))()
+]]
+
 -- Services 
 local InputService  = game:GetService("UserInputService")
 local HttpService   = game:GetService("HttpService")
@@ -169,7 +174,7 @@ end
 function Lemon:CreateChatUI()
     local ChatBox = Lemon:Create("Frame", {
         Parent = Lemon.Gui,
-        Position = dim2(0, 10, 0.5, -200),
+        Position = dim2(0, -290, 0.5, -200),
         Size = dim2(0, 280, 0, 380),
         BackgroundColor3 = themes.preset.background,
         BorderSizePixel = 0,
@@ -573,7 +578,7 @@ function Lemon:Window(properties)
         FillDirection = Enum.FillDirection.Horizontal, 
         HorizontalAlignment = Enum.HorizontalAlignment.Center, 
         VerticalAlignment = Enum.VerticalAlignment.Center, 
-        Padding = dim(0, 4) 
+        Padding = dim(0, 2) 
     })
 
     -- Dragging Logic
@@ -592,7 +597,7 @@ function Lemon:Window(properties)
             Items.Wrapper.Position = UDim2.new(StartPos.X.Scale, StartPos.X.Offset + delta.X, StartPos.Y.Scale, StartPos.Y.Offset + delta.Y)
             
             if ChatAPI.ChatBox then
-                ChatAPI.ChatBox.Position = dim2(0, 10, 0.5, Items.Wrapper.Position.Y.Offset + 80)
+                ChatAPI.ChatBox.Position = dim2(0, Items.Wrapper.Position.X.Offset - 290, 0.5, Items.Wrapper.Position.Y.Offset - 200)
             end
         end
     end)
@@ -609,8 +614,10 @@ function Lemon:Window(properties)
     -- Create Chat UI
     Lemon:CreateChatUI()
     
-    -- Connect to chat server
-    Lemon:ConnectChatServer()
+    -- Position chat relative to UI
+    if ChatAPI.ChatBox then
+        ChatAPI.ChatBox.Position = dim2(0, Items.Wrapper.Position.X.Offset - 290, 0.5, Items.Wrapper.Position.Y.Offset - 200)
+    end
 
     return setmetatable(Cfg, Lemon)
 end
@@ -628,7 +635,7 @@ function Lemon:Tab(properties)
 
     if not Cfg.Hidden then
         Items.Button = Lemon:Create("TextButton", { 
-            Parent = self.Items.TabHolder, Size = dim2(0, 120, 0, 32), 
+            Parent = self.Items.TabHolder, Size = dim2(0, 36, 0, 32), 
             BackgroundColor3 = themes.preset.accent,
             BackgroundTransparency = 1, 
             Text = "", AutoButtonColor = false, ZIndex = 7,
@@ -637,27 +644,10 @@ function Lemon:Tab(properties)
         Lemon:Themify(Items.Button, "accent", "BackgroundColor3")
         Lemon:Create("UICorner", { Parent = Items.Button, CornerRadius = dim(0, 10) })
         
-        Items.TabName = Lemon:Create("TextLabel", {
-            Parent = Items.Button,
-            Position = dim2(0, 8, 0.5, 0),
-            AnchorPoint = vec2(0, 0.5),
-            Size = dim2(1, -32, 1, 0),
-            BackgroundTransparency = 1,
-            Text = Cfg.Name,
-            TextColor3 = rgb(255, 255, 255),
-            TextSize = 14,
-            FontFace = Font.new("rbxassetid://12187365364", Enum.FontWeight.Bold),
-            TextTransparency = 1,
-            Visible = false,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            ZIndex = 8
-        })
-        Lemon:Themify(Items.TabName, "text", "TextColor3")
-        
         Items.IconImg = Lemon:Create("ImageLabel", { 
-            Parent = Items.Button, AnchorPoint = vec2(1, 0.5), Position = dim2(1, -8, 0.5, 0),
-            Size = dim2(0, 18, 0, 18), BackgroundTransparency = 1, 
-            Image = Cfg.Icon, ImageColor3 = rgb(15, 15, 15), ZIndex = 8 
+            Parent = Items.Button, AnchorPoint = vec2(0.5, 0.5), Position = dim2(0.5, 0, 0.5, 0),
+            Size = dim2(0, 20, 0, 20), BackgroundTransparency = 1, 
+            Image = Cfg.Icon, ImageColor3 = themes.preset.subtext, ZIndex = 8 
         })
         Lemon:Themify(Items.IconImg, "subtext", "ImageColor3")
     end
@@ -691,16 +681,11 @@ function Lemon:Tab(properties)
         if oldTab and oldTab.Button then
             Lemon:Tween(oldTab.Button, {BackgroundTransparency = 1}, buttonTween)
             Lemon:Tween(oldTab.IconImg, {ImageColor3 = themes.preset.subtext}, buttonTween)
-            if oldTab.TabName then
-                Lemon:Tween(oldTab.TabName, {TextTransparency = 1}, buttonTween)
-            end
         end
 
         if Items.Button then 
             Lemon:Tween(Items.Button, {BackgroundTransparency = 0}, buttonTween)
             Lemon:Tween(Items.IconImg, {ImageColor3 = rgb(15, 15, 15)}, buttonTween)
-            Items.TabName.Visible = true
-            Lemon:Tween(Items.TabName, {TextTransparency = 0}, buttonTween)
         end
         
         task.spawn(function()

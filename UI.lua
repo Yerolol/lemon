@@ -79,7 +79,7 @@ end
 
 -- Chat System Variables
 local ChatAPI = {
-    BaseURL = "http://212.132.99.151:9611",
+    BaseURL = "http://localhost:8000",
     ActiveUsers = 0,
     Messages = {},
     ChatEnabled = false,
@@ -405,8 +405,8 @@ function Lemon:Resizify(Parent)
     Lemon:Themify(grip, "accent", "ImageColor3")
 
     local IsResizing, StartInputPos, StartSize = false, nil, nil
-    local MIN_SIZE = vec2(520, 420)
-    local MAX_SIZE = vec2(750, 580)
+    local MIN_SIZE = vec2(600, 480)
+    local MAX_SIZE = vec2(900, 700)
 
     Resizing.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -439,7 +439,7 @@ function Lemon:Window(properties)
     local Cfg = {
         Title = properties.Title or properties.title or "Lemon", 
         Subtitle = properties.Subtitle or properties.subtitle or ".gg",
-        Size = properties.Size or properties.size or dim2(0, 580, 0, 440), 
+        Size = properties.Size or properties.size or dim2(0, 700, 0, 550), 
         TabInfo = nil, Items = {}, Tweening = false, IsSwitchingTab = false;
     }
 
@@ -462,7 +462,7 @@ function Lemon:Window(properties)
         scaleFactor = 0.88
     end
     
-    local windowSize = dim2(0, Cfg.Size.X.Offset * scaleFactor, 0, Cfg.Size.Y.Offset * scaleFactor)
+    local windowSize = dim2(0, Cfg.Size.X.Offset * scaleFactor * 1.2, 0, Cfg.Size.Y.Offset * scaleFactor * 1.2)
 
     Items.Wrapper = Lemon:Create("Frame", {
         Parent = Lemon.Gui, Position = dim2(0.5, -windowSize.X.Offset / 2, 0.5, -windowSize.Y.Offset / 2),
@@ -491,7 +491,7 @@ function Lemon:Window(properties)
         BackgroundColor3 = themes.preset.background, BorderSizePixel = 0, ZIndex = 1, ClipsDescendants = true
     })
     Lemon:Themify(Items.Window, "background", "BackgroundColor3")
-    Lemon:Create("UICorner", { Parent = Items.Window, CornerRadius = dim(0, 8) })
+    Lemon:Create("UICorner", { Parent = Items.Window, CornerRadius = dim(0, 12) })
     Lemon:Themify(Lemon:Create("UIStroke", { Parent = Items.Window, Color = themes.preset.outline, Thickness = 1.5 }), "outline", "Color")
 
     Items.Header = Lemon:Create("Frame", { Parent = Items.Window, Size = dim2(1, 0, 0, 45), BackgroundTransparency = 1, Active = true, ZIndex = 2 })
@@ -524,21 +524,21 @@ function Lemon:Window(properties)
     })
     Lemon:Themify(Items.SubLogoText, "subtext", "TextColor3")
 
-    -- Open/Close button
+    -- Open/Close button (moved to top-right outside UI)
     Items.CloseBtn = Lemon:Create("ImageButton", {
-        Parent = Items.Header,
-        AnchorPoint = vec2(1, 0.5),
-        Position = dim2(1, -16, 0.5, 0),
-        Size = dim2(0, 22, 0, 22),
+        Parent = Lemon.Gui,
+        AnchorPoint = vec2(1, 0),
+        Position = dim2(1, -20, 0, 20),
+        Size = dim2(0, 28, 0, 28),
         BackgroundTransparency = 1,
         Image = "rbxassetid://86658474847671",
         ImageColor3 = themes.preset.subtext,
-        ZIndex = 10
+        ZIndex = 1000
     })
     Lemon:Themify(Items.CloseBtn, "subtext", "ImageColor3")
     
     Items.CloseBtn.MouseButton1Click:Connect(function()
-        Cfg.ToggleMenu(false)
+        Cfg.ToggleMenu()
     end)
 
     Items.PageHolder = Lemon:Create("Frame", { 
@@ -591,18 +591,7 @@ function Lemon:Window(properties)
         if Cfg.SettingsTabOpen then Cfg.SettingsTabOpen() end
     end)
 
-    -- Chat Button
-    Items.ChatBtn = Lemon:Create("ImageButton", {
-        Parent = Items.Footer, AnchorPoint = vec2(1, 0.5), Position = dim2(1, -46, 0.5, 0),
-        Size = dim2(0, 20, 0, 20), BackgroundTransparency = 1, Image = "rbxassetid://12338898398", ImageColor3 = themes.preset.subtext, ZIndex = 5
-    })
-    Lemon:Themify(Items.ChatBtn, "subtext", "ImageColor3")
-    
-    Items.ChatBtn.MouseButton1Click:Connect(function()
-        if ChatAPI.ChatBox then
-            ChatAPI.ChatBox.Visible = not ChatAPI.ChatBox.Visible
-        end
-    end)
+    -- Chat Button removed (use Settings toggle instead)
 
     -- Tab Box (Outside UI, below it)
     Items.TabBox = Lemon:Create("Frame", {
@@ -615,7 +604,7 @@ function Lemon:Window(properties)
         BorderSizePixel = 0,
         ZIndex = 5
     })
-    Lemon:Create("UICorner", { Parent = Items.TabBox, CornerRadius = dim(0, 10) })
+    Lemon:Create("UICorner", { Parent = Items.TabBox, CornerRadius = dim(0, 14) })
     Lemon:Themify(Items.TabBox, "section", "BackgroundColor3")
     Lemon:Themify(Lemon:Create("UIStroke", { Parent = Items.TabBox, Color = themes.preset.outline, Thickness = 1 }), "outline", "Color")
     
@@ -694,38 +683,38 @@ function Lemon:Tab(properties)
 
     if not Cfg.Hidden then
         Items.Button = Lemon:Create("TextButton", { 
-            Parent = self.Items.TabHolder, Size = dim2(0, 30, 0, 30), 
+            Parent = self.Items.TabHolder, Size = dim2(0, 110, 0, 32), 
             BackgroundColor3 = themes.preset.accent,
             BackgroundTransparency = 1, 
             Text = "", AutoButtonColor = false, ZIndex = 7,
             ClipsDescendants = true
         })
         Lemon:Themify(Items.Button, "accent", "BackgroundColor3")
-        Lemon:Create("UICorner", { Parent = Items.Button, CornerRadius = dim(0, 8) })
-        
-        Items.IconImg = Lemon:Create("ImageLabel", { 
-            Parent = Items.Button, AnchorPoint = vec2(0.5, 0.5), Position = dim2(0.5, 0, 0.5, 0),
-            Size = dim2(0, 16, 0, 16), BackgroundTransparency = 1, 
-            Image = Cfg.Icon, ImageColor3 = themes.preset.subtext, ZIndex = 8 
-        })
-        Lemon:Themify(Items.IconImg, "subtext", "ImageColor3")
+        Lemon:Create("UICorner", { Parent = Items.Button, CornerRadius = dim(0, 10) })
         
         Items.TabName = Lemon:Create("TextLabel", {
             Parent = Items.Button,
-            Position = dim2(0.5, 0, 0.5, 0),
-            AnchorPoint = vec2(0.5, 0.5),
-            Size = dim2(0, 0, 0, 0),
-            AutomaticSize = Enum.AutomaticSize.X,
+            Position = dim2(0, 12, 0.5, 0),
+            AnchorPoint = vec2(0, 0.5),
+            Size = dim2(1, -40, 1, 0),
             BackgroundTransparency = 1,
             Text = Cfg.Name,
-            TextColor3 = themes.preset.text,
-            TextSize = 11,
-            FontFace = Font.new("rbxassetid://12187365364", Enum.FontWeight.Medium),
+            TextColor3 = rgb(255, 255, 255),
+            TextSize = 13,
+            FontFace = Font.new("rbxassetid://12187365364", Enum.FontWeight.Bold),
             TextTransparency = 1,
             Visible = false,
+            TextXAlignment = Enum.TextXAlignment.Left,
             ZIndex = 8
         })
         Lemon:Themify(Items.TabName, "text", "TextColor3")
+        
+        Items.IconImg = Lemon:Create("ImageLabel", { 
+            Parent = Items.Button, AnchorPoint = vec2(0, 0.5), Position = dim2(1, -16, 0.5, 0),
+            Size = dim2(0, 18, 0, 18), BackgroundTransparency = 1, 
+            Image = Cfg.Icon, ImageColor3 = rgb(15, 15, 15), ZIndex = 8 
+        })
+        Lemon:Themify(Items.IconImg, "subtext", "ImageColor3")
     end
 
     Items.Pages = Lemon:Create("CanvasGroup", { Parent = Lemon.Other, Size = dim2(1, 0, 1, 0), BackgroundTransparency = 1, Visible = false, GroupTransparency = 1 })
@@ -755,15 +744,15 @@ function Lemon:Tab(properties)
         local buttonTween = TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
 
         if oldTab and oldTab.Button then
-            Lemon:Tween(oldTab.Button, {BackgroundTransparency = 1, Size = dim2(0, 30, 0, 30)}, buttonTween)
+            Lemon:Tween(oldTab.Button, {BackgroundTransparency = 1}, buttonTween)
             Lemon:Tween(oldTab.IconImg, {ImageColor3 = themes.preset.subtext}, buttonTween)
             if oldTab.TabName then
-                oldTab.TabName.Visible = false
+                Lemon:Tween(oldTab.TabName, {TextTransparency = 1}, buttonTween)
             end
         end
 
         if Items.Button then 
-            Lemon:Tween(Items.Button, {BackgroundTransparency = 0, Size = dim2(0, 80, 0, 30)}, buttonTween)
+            Lemon:Tween(Items.Button, {BackgroundTransparency = 0}, buttonTween)
             Lemon:Tween(Items.IconImg, {ImageColor3 = rgb(15, 15, 15)}, buttonTween)
             Items.TabName.Visible = true
             Lemon:Tween(Items.TabName, {TextTransparency = 0}, buttonTween)
@@ -811,7 +800,7 @@ function Lemon:Section(properties)
         BackgroundColor3 = themes.preset.section, BorderSizePixel = 0, ClipsDescendants = true 
     })
     Lemon:Themify(Items.Section, "section", "BackgroundColor3")
-    Lemon:Create("UICorner", { Parent = Items.Section, CornerRadius = dim(0, 6) })
+    Lemon:Create("UICorner", { Parent = Items.Section, CornerRadius = dim(0, 10) })
     
     Items.AccentLine = Lemon:Create("Frame", {
         Parent = Items.Section, Size = dim2(0, 3, 1, 0), Position = dim2(0, 0, 0, 0),
@@ -862,7 +851,7 @@ function Lemon:Toggle(properties)
         BackgroundColor3 = themes.preset.element, BorderSizePixel = 0 
     })
     Lemon:Themify(Items.Checkbox, "element", "BackgroundColor3")
-    Lemon:Create("UICorner", { Parent = Items.Checkbox, CornerRadius = dim(0, 3) })
+    Lemon:Create("UICorner", { Parent = Items.Checkbox, CornerRadius = dim(0, 5) })
 
     Items.CheckFill = Lemon:Create("Frame", {
         Parent = Items.Checkbox, Size = dim2(1, 0, 1, 0),
@@ -870,7 +859,7 @@ function Lemon:Toggle(properties)
         BackgroundTransparency = 1
     })
     Lemon:Themify(Items.CheckFill, "accent", "BackgroundColor3")
-    Lemon:Create("UICorner", { Parent = Items.CheckFill, CornerRadius = dim(0, 3) })
+    Lemon:Create("UICorner", { Parent = Items.CheckFill, CornerRadius = dim(0, 5) })
 
     Items.Title = Lemon:Create("TextLabel", { 
         Parent = Items.Button, Position = dim2(0, 26, 0.5, 0), AnchorPoint = vec2(0, 0.5), Size = dim2(1, -26, 1, 0), 
@@ -909,7 +898,7 @@ function Lemon:Button(properties)
     })
     Lemon:Themify(Items.Button, "element", "BackgroundColor3")
     Lemon:Themify(Items.Button, "subtext", "TextColor3")
-    Lemon:Create("UICorner", { Parent = Items.Button, CornerRadius = dim(0, 4) })
+    Lemon:Create("UICorner", { Parent = Items.Button, CornerRadius = dim(0, 8) })
 
     Items.Button.MouseButton1Click:Connect(function()
         Lemon:Tween(Items.Button, {BackgroundColor3 = themes.preset.accent, TextColor3 = rgb(15,15,15)}, TweenInfo.new(0.1))
@@ -944,14 +933,14 @@ function Lemon:Slider(properties)
 
     Items.Track = Lemon:Create("TextButton", { Parent = Items.Container, Position = dim2(0, 3, 0, 22), Size = dim2(1, -7, 0, 5), BackgroundColor3 = themes.preset.element, Text = "", AutoButtonColor = false })
     Lemon:Themify(Items.Track, "element", "BackgroundColor3")
-    Lemon:Create("UICorner", { Parent = Items.Track, CornerRadius = dim(1, 0) })
+    Lemon:Create("UICorner", { Parent = Items.Track, CornerRadius = dim(0, 8) })
 
     Items.Fill = Lemon:Create("Frame", { Parent = Items.Track, Size = dim2(0, 0, 1, 0), BackgroundColor3 = themes.preset.accent })
     Lemon:Themify(Items.Fill, "accent", "BackgroundColor3")
-    Lemon:Create("UICorner", { Parent = Items.Fill, CornerRadius = dim(1, 0) })
+    Lemon:Create("UICorner", { Parent = Items.Fill, CornerRadius = dim(0, 8) })
     
     Items.Knob = Lemon:Create("Frame", { Parent = Items.Fill, AnchorPoint = vec2(0.5, 0.5), Position = dim2(1, 0, 0.5, 0), Size = dim2(0, 10, 0, 10), BackgroundColor3 = themes.preset.accent })
-    Lemon:Create("UICorner", { Parent = Items.Knob, CornerRadius = dim(1, 0) })
+    Lemon:Create("UICorner", { Parent = Items.Knob, CornerRadius = dim(0, 8) })
     Lemon:Themify(Items.Knob, "accent", "BackgroundColor3")
 
     local Value = Cfg.Default
@@ -1000,7 +989,7 @@ function Lemon:Textbox(properties)
     Items.Container = Lemon:Create("Frame", { Parent = self.Items.Container, Size = dim2(1, 0, 0, 30), BackgroundTransparency = 1 })
     Items.Bg = Lemon:Create("Frame", { Parent = Items.Container, Size = dim2(1, 0, 1, 0), BackgroundColor3 = themes.preset.element })
     Lemon:Themify(Items.Bg, "element", "BackgroundColor3")
-    Lemon:Create("UICorner", { Parent = Items.Bg, CornerRadius = dim(0, 4) })
+    Lemon:Create("UICorner", { Parent = Items.Bg, CornerRadius = dim(0, 8) })
 
     Items.Input = Lemon:Create("TextBox", { 
         Parent = Items.Bg, Position = dim2(0, 10, 0, 0), Size = dim2(1, -20, 1, 0), BackgroundTransparency = 1, 
@@ -1044,7 +1033,7 @@ function Lemon:Dropdown(properties)
         BackgroundColor3 = themes.preset.element, Text = "", AutoButtonColor = false 
     })
     Lemon:Themify(Items.Main, "element", "BackgroundColor3")
-    Lemon:Create("UICorner", { Parent = Items.Main, CornerRadius = dim(0, 4) })
+    Lemon:Create("UICorner", { Parent = Items.Main, CornerRadius = dim(0, 8) })
 
     Items.SelectedText = Lemon:Create("TextLabel", { Parent = Items.Main, Position = dim2(0, 10, 0, 0), Size = dim2(1, -20, 1, 0), BackgroundTransparency = 1, Text = Cfg.Default or "Select...", TextColor3 = themes.preset.subtext, TextSize = 12, FontFace = Font.new("rbxassetid://12187365364", Enum.FontWeight.Medium), TextXAlignment = Enum.TextXAlignment.Left })
     Lemon:Themify(Items.SelectedText, "subtext", "TextColor3")
@@ -1056,7 +1045,7 @@ function Lemon:Dropdown(properties)
         BackgroundColor3 = themes.preset.element, Visible = false, ZIndex = 200, ClipsDescendants = true 
     })
     Lemon:Themify(Items.DropFrame, "element", "BackgroundColor3")
-    Lemon:Create("UICorner", { Parent = Items.DropFrame, CornerRadius = dim(0, 4) })
+    Lemon:Create("UICorner", { Parent = Items.DropFrame, CornerRadius = dim(0, 8) })
 
     Items.Scroll = Lemon:Create("ScrollingFrame", { 
         Parent = Items.DropFrame, Size = dim2(1, 0, 1, 0), 
@@ -1159,7 +1148,7 @@ function Lemon:Colorpicker(properties)
 
     local parentContainer = self.Items.Title or self.Items.Button or self.Items.Container
     local btn = Lemon:Create("TextButton", { Parent = parentContainer, AnchorPoint = vec2(1, 0.5), Position = dim2(1, -5, 0.5, 0), Size = dim2(0, 28, 0, 13), BackgroundColor3 = Cfg.Color, Text = "" })
-    Lemon:Create("UICorner", {Parent = btn, CornerRadius = dim(0, 3)})
+    Lemon:Create("UICorner", {Parent = btn, CornerRadius = dim(0, 8)})
 
     local h, s, v = Color3.toHSV(Cfg.Color)
     
@@ -1168,16 +1157,16 @@ function Lemon:Colorpicker(properties)
     Lemon:Create("UICorner", { Parent = Items.DropFrame, CornerRadius = dim(0, 4) })
 
     Items.SVMap = Lemon:Create("TextButton", { Parent = Items.DropFrame, Position = dim2(0, 6, 0, 6), Size = dim2(1, -12, 1, -34), AutoButtonColor = false, Text = "", BackgroundColor3 = Color3.fromHSV(h, 1, 1), ZIndex = 201 })
-    Lemon:Create("UICorner", { Parent = Items.SVMap, CornerRadius = dim(0, 3) })
+    Lemon:Create("UICorner", { Parent = Items.SVMap, CornerRadius = dim(0, 8) })
     Items.SVImage = Lemon:Create("ImageLabel", { Parent = Items.SVMap, Size = dim2(1, 0, 1, 0), Image = "rbxassetid://4155801252", BackgroundTransparency = 1, BorderSizePixel = 0, ZIndex = 202 })
-    Lemon:Create("UICorner", { Parent = Items.SVImage, CornerRadius = dim(0, 3) })
+    Lemon:Create("UICorner", { Parent = Items.SVImage, CornerRadius = dim(0, 8) })
     
     Items.SVKnob = Lemon:Create("Frame", { Parent = Items.SVMap, AnchorPoint = vec2(0.5, 0.5), Size = dim2(0, 4, 0, 4), BackgroundColor3 = rgb(255,255,255), ZIndex = 203 })
     Lemon:Create("UICorner", { Parent = Items.SVKnob, CornerRadius = dim(1, 0) })
     Lemon:Create("UIStroke", { Parent = Items.SVKnob, Color = rgb(0,0,0) })
 
     Items.HueBar = Lemon:Create("TextButton", { Parent = Items.DropFrame, Position = dim2(0, 6, 1, -20), Size = dim2(1, -12, 0, 12), AutoButtonColor = false, Text = "", BorderSizePixel = 0, BackgroundColor3 = rgb(255, 255, 255), ZIndex = 201 })
-    Lemon:Create("UICorner", { Parent = Items.HueBar, CornerRadius = dim(0, 3) })
+    Lemon:Create("UICorner", { Parent = Items.HueBar, CornerRadius = dim(0, 8) })
     Lemon:Create("UIGradient", { Parent = Items.HueBar, Color = ColorSequence.new({ColorSequenceKeypoint.new(0, rgb(255,0,0)), ColorSequenceKeypoint.new(0.167, rgb(255,0,255)), ColorSequenceKeypoint.new(0.333, rgb(0,0,255)), ColorSequenceKeypoint.new(0.5, rgb(0,255,255)), ColorSequenceKeypoint.new(0.667, rgb(0,255,0)), ColorSequenceKeypoint.new(0.833, rgb(255,255,0)), ColorSequenceKeypoint.new(1, rgb(255,0,0))}) })
     
     Items.HueKnob = Lemon:Create("Frame", { Parent = Items.HueBar, AnchorPoint = vec2(0.5, 0.5), Size = dim2(0, 2, 1, 4), BackgroundColor3 = rgb(255,255,255), ZIndex = 203 })
@@ -1255,7 +1244,7 @@ function Lemon:Keybind(properties)
     local KeyBtn = Lemon:Create("TextButton", { Parent = parentContainer, AnchorPoint = vec2(1, 0.5), Position = dim2(1, -5, 0.5, 0), Size = dim2(0, 35, 0, 14), BackgroundColor3 = themes.preset.element, TextColor3 = themes.preset.subtext, Text = Keys[Cfg.Default] or "None", TextSize = 11, FontFace = Font.new("rbxassetid://12187365364", Enum.FontWeight.Medium) })
     Lemon:Themify(KeyBtn, "element", "BackgroundColor3")
     Lemon:Themify(KeyBtn, "subtext", "TextColor3")
-    Lemon:Create("UICorner", {Parent = KeyBtn, CornerRadius = dim(0, 3)})
+    Lemon:Create("UICorner", {Parent = KeyBtn, CornerRadius = dim(0, 8)})
 
     local binding = false
     KeyBtn.MouseButton1Click:Connect(function() binding = true; KeyBtn.Text = "..." end)
@@ -1306,7 +1295,7 @@ function Notifications:Create(properties)
    
     Items.Outline = Lemon:Create("Frame", { Parent = Lemon.Gui; Position = dim_offset(-500, 50); Size = dim2(0, 280, 0, 0); AutomaticSize = Enum.AutomaticSize.Y; BackgroundColor3 = themes.preset.background; BorderSizePixel = 0; ZIndex = 300, ClipsDescendants = true })
     Lemon:Themify(Items.Outline, "background", "BackgroundColor3")
-    Lemon:Create("UICorner", { Parent = Items.Outline, CornerRadius = dim(0, 4) })
+    Lemon:Create("UICorner", { Parent = Items.Outline, CornerRadius = dim(0, 10) })
    
     Items.Name = Lemon:Create("TextLabel", {
         Parent = Items.Outline; Text = Cfg.Name; TextColor3 = themes.preset.text; FontFace = Font.new("rbxassetid://12187365364", Enum.FontWeight.Medium);
